@@ -35,9 +35,28 @@ dcommands_config:
         # This will be the color of your server's name.
         color: <blue>
 
-    # This is the color that global messages will have.
-    # So far, all commands that use this color are /save, /restart and /clearchat.
-    global_message_color: <red>
+    # These are the messages and colors that'll be broadcasted when using the /save command.
+    save:
+        saving: Saving world files..
+        saved: World files saved.
+        color: <&[warning]>
+
+    # These are the messages and colors that'll be broadcasted when using the /restart command.
+    restart:
+        # The time will be automatically added after the message, don't try to add it yourself!
+        message: Restarting server in
+        color: <dark_red>
+        end: Server restarting.
+
+    enchant:
+        # These are specific error messages that will be shown under specific conditions. All of them will share the same color.
+        error:
+            invalid_enchant: This enchantment does not exist!
+            remove_no_permission: You don't have permission to remove enchantments!
+            no_enchant: Item doesn't have this enchantment!
+            color: <&[error]>
+        # This is the color for when an /enchant runs succesfully.
+        color: <&[emphasis]>
 
     private:
         # This is the color that private messages will have.
@@ -47,8 +66,25 @@ dcommands_config:
         sender: <blue>
         receiver: <dark_aqua>
 
+        # These are the error messages for the /tell, /msg, and /message commands. They'll share the same color.
+        error:
+            msg_to_yourself: You can't send messages to yourself!
+            empty_message: You can't send an empty message!
+            color: <&[error]>
+        # These are the error messages for the /r command. They'll share the same color.
+        reply:
+            no_replies: You don't have anyone to reply to!
+            not_online: The last player that messaged you isn't online anymore!
+            empty: Your message cannot be empty!
+            color: <&[error]>
+
+    clearchat:
+        # This is the message that'll be shown after cleaning up chat.
+        message: Chat cleared.
+        # This is the color that the message will have.
+        color: <aqua>
+
     ban:
-        # This is the color ban messages will have.
         message:
             # These are the messages that'll be shown when kicking a banned player from the server.
             perma: You're permanently banned from this server!
@@ -60,12 +96,11 @@ dcommands_config:
                 ## Don't try to input the duration yourself, it WILL break.
                 footer: Your ban lasts until<&co>
 
-            # You can use <empty> here. If you do, it'll use the same color as the server color.
+            # This is the color that the messages above will have. If invalid, will default to the server color.
             color: <dark_red>
 
         # This is the color ban reasons and durations will have.
         value: <gray>
-
         # - These colors will also be used when preventing a banned user from joining the server!
 
     unban:
@@ -76,6 +111,25 @@ dcommands_config:
         # You can use <empty> to default to the message's color.
         player: <dark_aqua>
 
+    # These are the messages and colors that will be used by the gamemode commands.
+    gamemode:
+        creative:
+            self: Gamemode set to creative.
+            another: Gamemode set to creative by an admin.
+            color: <&[warning]>
+        survival:
+            self: Gamemode set to survival.
+            another: Gamemode set to survival by an admin.
+            color: <&[warning]>
+        spectator:
+            self: Gamemode set to spectator.
+            another: Gamemode set to spectator by an admin.
+            color: <&[warning]>
+        adventure:
+            self: Gamemode set to adventure.
+            another: Gamemode set to adventure by an admin.
+            color: <&[warning]>
+
     # These are the colors for the command /dcommands, which lists all available dCommands.
     dcommands:
         header:
@@ -85,7 +139,7 @@ dcommands_config:
             # This is the color of the header text.
             color: <dark_aqua>
 
-        # This is the color that commands will have. If invalid, will defualt to the header color.
+        # This is the color that commands will have. If invalid, will default to the header color.
         commands: <dark_aqua>
 
         separator:
@@ -126,7 +180,6 @@ dcommands_config:
             # You can use <empty> here. If you do, it'll use the same color as the message color.
             color: <aqua>
 
-    # These are the configuration for the /feed command.
     feed:
         message:
             # Message sent to you, when you feed yourself.
@@ -135,6 +188,50 @@ dcommands_config:
             another: You've been fed by a higher power!
         # This is the color the messages above will use.
         color: <aqua>
+
+    vanish:
+        message:
+            # Self-explanatory.
+            on: You are now vanished.
+            off: You are no longer vanished.
+            color: <&[warning]>
+
+    fly:
+        message:
+            # Speed tag must have .mul[10]! The script works with it's value multiplied by 10 to be more human understandable, changing it would create confusion.
+            on: Fly mode turned on, at speed <player.fly_speed.mul[10]>.
+            off: Fly mode turned off.
+            color: <&[warning]>
+
+    arguments:
+        not_enough:
+            message: Not enough arguments! Correct usage<&co>
+            color: <&[error]>
+        too_many:
+            message: Too many arguments! Correct usage<&co>
+            color: <&[error]>
+        command_info:
+            usage: <&[warning]>
+            description: <&[base]>
+            message: <&[emphasis]>
+
+    inject_player:
+        message: Player not found!
+        color: <&[error]>
+
+    smite:
+        warn_target:
+            enabled: false
+            message: You have been struck!
+            color: <&[warning]>
+
+    godmode:
+        on:
+            message: Godmode turned on.
+            color: <&[warning]>
+        off:
+            message: Godmode turned off.
+            color: <&[warning]>
 
     # For more advanced users:
     # Every script has it's own usage and description data args, they're used whenever you use the commands wrong
@@ -151,21 +248,26 @@ dcommands_save:
     description: Saves denizen files and world files.
     usage: /save
     permission: dcommands.save
+    tab completions:
+        1: <empty>
     data:
         arguments:
             single: true
     debug: false
     script:
+    - define save.saving <script[dcommands_config].parsed_key[save.saving].if_null[Error parsing key!]>
+    - define save.saved <script[dcommands_config].parsed_key[save.saved].if_null[Error parsing key!]>
+    - define save.color <color[<script[dcommands_config].parsed_key[save.color]>].if_null[<color[white]>]>
     - inject dcommands_inject_arguments
     - inject dcommands_server_definitions
-    - announce "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&color[<[global_message_color]>]> Saving world files.."
-    - announce to_console "<&ss>bSaving world files.."
+    - announce "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&color[<[save.color]>]> <[save.saving]>"
+    - announce to_console <&color[<[save.color]>]><[save.saving]>
     - foreach <server.worlds> as:world:
         - wait 0.01s
         - adjust <[world]> save
     - adjust server save
-    - announce "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&color[<[global_message_color]>]> World files saved."
-    - announce to_console "<&ss>bWorld files saved."
+    - announce "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&color[<[save.color]>]> <[save.saved]>"
+    - announce to_console <&color[<[save.color]>]><[save.saved]>
 
 
 dcommands_restart:
@@ -175,7 +277,7 @@ dcommands_restart:
     usage: /restart (DurationTag)
     permission: dcommands.restart
     tab completions:
-        1: <list>
+        1: <empty>
     data:
         arguments:
             minimum: 0
@@ -183,20 +285,24 @@ dcommands_restart:
     debug: false
     script:
     - inject dcommands_inject_arguments
-    - if <server.has_flag[restarting]>:
+    - if <server.has_flag[dcommands.restarting]>:
         - narrate "<&[error]>Server is already restarting!"
         - stop
-    - flag server restarting
+    - flag server dcommands.restarting
     - inject dcommands_server_definitions
+    - definemap restart:
+        message: <script[dcommands_config].parsed_key[restart.message].if_null[Error parsing key!]>
+        color: <color[<script[dcommands_config].parsed_key[restart.color]>].if_null[<color[white]>]>
+        end: <script[dcommands_config].parsed_key[restart.end].if_null[Error parsing key!]>
     - if <context.args.is_empty>:
-        - announce "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&color[<[global_message_color]>]> Restarting server in 30 seconds."
-        - announce to_console "<&ss>4Restarting server in 30 seconds."
+        - announce "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&color[<[restart.color]>]> <[restart.message]> 30 seconds."
+        - announce to_console "<&color[<[restart.color]>]><[restart.message]> 30 seconds."
         - wait 20s
-        - announce "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&color[<[global_message_color]>]> Restarting server in 10 seconds."
-        - announce to_console "<&ss>4Restarting server in 10 seconds."
+        - announce "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&color[<[restart.color]>]> <[restart.message]> 10 seconds."
+        - announce to_console "<&color[<[restart.color]>]><[restart.message]> 10 seconds."
         - wait 5s
-        - announce "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&color[<[global_message_color]>]> Restarting server in 5 seconds."
-        - announce to_console "<&ss>4Restarting server in 5 seconds."
+        - announce "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&color[<[restart.color]>]> <[restart.message]> 5 seconds."
+        - announce to_console "<&color[<[restart.color]>]><[restart.message]> 5 seconds."
         - wait 5s
         - adjust server restart
         - stop
@@ -206,8 +312,8 @@ dcommands_restart:
         - narrate "<&[error]>15s, 15m, 15h."
         - stop
     - repeat 20:
-        - announce "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&color[<[global_message_color]>]> Restarting server in <[duration].formatted_words>."
-        - announce to_console "<&ss>4Restarting server in <[duration].formatted_words>."
+        - announce "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&color[<[restart.color]>]> <[restart.message]> <[duration].formatted_words>."
+        - announce to_console "<&4>Restarting server in <[duration].formatted_words>."
         - define duration <[duration].in_seconds.div[2]>
         - if <[duration]> > 10:
             - define duration <[duration].round_up_to_precision[10]>
@@ -215,8 +321,8 @@ dcommands_restart:
             - define duration <[duration].round_up_to_precision[0.1]>
         - if <[duration]> <= 1:
             - wait 1s
-            - announce "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&color[<[global_message_color]>]> Restarting server."
-            - announce to_console "<&ss>4Restarting server."
+            - announce <[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&color[<[restart.color]>]> <[restart.end]>
+            - announce to_console <&color[<[restart.color]>]> <[restart.end]>
             - wait 1s
             - adjust server restart
             - stop
@@ -242,49 +348,62 @@ dcommands_enchant:
     - inject dcommands_inject_arguments
     - define enchantraw <context.args.first>
     - define enchant <enchantment[<[enchantraw]>].if_null[null]>
+    - define color <color[<script[dcommands_config].parsed_key[enchant.color]>].if_null[<color[white]>]>
+    - define error.color <color[<script[dcommands_config].parsed_key[enchant.error.color]>].if_null[<color[white]>]>
     - if <[enchant]> == null:
-        - narrate "<&[error]>This enchantment does not exist!"
+        - narrate <&color[<[error.color]>]><script[dcommands_config].parsed_key[enchant.error.invalid_enchant].if_null[Error parsing key!]>
         - stop
     - define arg <context.args.get[2].if_null[1]>
     - if <[arg].is_integer>:
-        - narrate "<&[emphasis]>Enchanting <player.item_in_hand.material.translated_name> with <[enchant].full_name[<[arg]>].strip_color>."
+        - narrate "<&color[<[color]>]>Enchanting <player.item_in_hand.material.translated_name> with <[enchant].full_name[<[arg]>].strip_color>."
         - inventory adjust slot:hand enchantments:<[enchantraw]>,<[arg]>
     - else:
         - if <[arg]> == remove:
+            - if !<player.has_permission[dcommands.enchant.remove]>:
+                - narrate <&color[<[error.color]>]><script[dcommands_config].parsed_key[enchant.error.remove_no_permission].if_null[Error parsing key!]>
+                - stop
+            - if !<player.item_in_hand.enchantment_map.keys.contains[<[enchantraw]>]>:
+                - narrate <&color[<[error.color]>]><script[dcommands_config].parsed_key[enchant.error.no_enchant].if_null[Error parsing key!]>
+                - stop
             - define level <player.item_in_hand.enchantment_map.deep_get[<[enchantraw]>]>
             - inventory adjust slot:hand remove_enchantments:<[enchantraw]>
-            - narrate "<&[emphasis]>Removed <[enchant].full_name[<[level]>].strip_color> from <player.item_in_hand.material.translated_name>."
+            - narrate "<&color[<[color]>]>Removed <[enchant].full_name[<[level]>].strip_color> from <player.item_in_hand.material.translated_name>."
         - else:
             - narrate "<&[error]>Incorrect usage!"
             - narrate <&[error]><script.data_key[usage]>
-            - stop
 
 
 dcommands_ban_handler:
     type: world
     debug: false
     events:
-        on player prelogin flagged:banned:
-        - determine kicked+<proc[ban_handler_proc].context[<player>]>
+        on player prelogin flagged:dcommands.banned:
+        - determine kicked+<proc[dcommands_ban_proc].context[<player>|<player.ban_reason>]>
+        on player prelogin flagged:dcommands.tempbanned:
+        - determine kicked+<proc[dcommands_tempban_proc].context[<player>|<player.ban_reason>|<player.ban_expiration_time>]>
 
 dcommands_ban_proc:
     type: procedure
-    definitions: player
+    definitions: player|reason
     debug: false
     script:
-    - define reason <[player].flag[banned.reason]>
     - inject dcommands_server_definitions
     - inject dcommands_ban_definitions
-    - if <[player].has_flag[banned.duration]>:
-        - define duration <[player].flag[banned.duration]>
-        - determine "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&nl><&color[<[ban.message.color]>]><[ban.message.temp.header]><&nl><&nl><&color[<[ban.message.color]>]>Reason: <&color[<[ban.value]>]><[reason]><&nl><&color[<[ban.message.color]>]><[ban.message.temp.footer]> <&color[<[ban.value]>]><[duration].formatted_words>"
-    - else:
-        - determine "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&nl><&color[<[ban.message.color]>]><[ban.message.perma]><&nl><&nl><&color[<[ban.message.color]>]>Reason: <&color[<[ban.value]>]><[reason]>"
+    - determine "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&nl><&color[<[ban.message.color]>]><[ban.message.perma]><&nl><&nl><&color[<[ban.message.color]>]>Reason: <&color[<[ban.value]>]><[reason]>"
+
+dcommands_tempban_proc:
+    type: procedure
+    definitions: player|reason|expiration
+    debug: false
+    script:
+    - inject dcommands_server_definitions
+    - inject dcommands_ban_definitions
+    - determine "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&nl><&color[<[ban.message.color]>]><[ban.message.temp.header]><&nl><&nl><&color[<[ban.message.color]>]>Reason: <&color[<[ban.value]>]><[reason]><&nl><&color[<[ban.message.color]>]><[ban.message.temp.footer]> <&color[<[ban.value]>]><[expiration].format>"
 
 dcommands_ban:
     type: command
     name: ban
-    description: Bans someone.
+    description: Permanently bans the desired player.
     usage: /ban [name] [reason]
     permission: dcommands.ban
     tab completions:
@@ -300,26 +419,17 @@ dcommands_ban:
     - if <[player]> == <player>:
         - narrate "<&[error]>You cannot ban yourself!"
         - stop
-    - if <[player].has_flag[banned]>:
+    - if <[player].has_flag[dcommands.banned]>:
         - narrate "<&[error]>This player is already banned!"
         - stop
     - inject dcommands_server_definitions
     - inject dcommands_ban_definitions
     - define reason <context.raw_args.after[<[name]>].substring[2]>
     - announce "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]> <&color[<[ban.message.color]>]>Player <[name]> has been permanently banned for <&dq><&color[<[ban.value]>]><[reason]><&color[<[ban.message.color]>]><&dq>."
-    - announce to_console "<&ss>4<player.name> has  permanently banned <[name]> for <&dq><[reason]><&dq>."
-    - flag <[player]> banned.reason:<[reason]>
-    - kick <[player]> reason:<proc[ban_handler_proc].context[<player>]>
-
-dcommands_ban_definitions:
-    type: task
-    debug: false
-    script:
-    - define ban.message.perma <server.flag[dcommands.ban.message.perma]>
-    - define ban.message.temp.header <server.flag[dcommands.ban.message.temp.header]>
-    - define ban.message.temp.footer <server.flag[dcommands.ban.message.temp.footer]>
-    - define ban.message.color <server.flag[dcommands.ban.message.color]>
-    - define ban.value <server.flag[dcommands.ban.value]>
+    - announce to_console "<&color[<[ban.message.color]>]><player.name> has  permanently banned <[name]> for <&dq><[reason]><&dq>."
+    - flag <[player]> dcommands.banned
+    - kick <[player]> reason:Disconnected
+    - ban <[player]> reason:<[reason]> source:<player.name.if_null[Console]>
 
 dcommands_tempban:
     type: command
@@ -338,11 +448,11 @@ dcommands_tempban:
     - inject dcommands_inject_arguments
     - inject dcommands_inject_player
     - if <[player]> == <player>:
-        - narrate "<&[error]>You cannot ban yourself!"
+        - narrate "<&[error]>You cannot tempban yourself!"
         - stop
     - define duration <context.args.get[2]>
     - if <duration[<[duration]>].exists>:
-        - if <[player].has_flag[banned]>:
+        - if <[player].is_banned>:
             - narrate "<&[error]>This player is already banned!"
             - stop
         - inject dcommands_server_definitions
@@ -350,10 +460,10 @@ dcommands_tempban:
         - define reason <context.raw_args.after[<[duration]>].substring[2]>
         - define duration <duration[<[duration]>]>
         - announce "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]> <&color[<[ban.message.color]>]>Player <[name]> has been temporarily banned for <&color[<[ban.value]>]><[duration].formatted_words><&color[<[ban.message.color]>]>, for <&dq><&color[<[ban.value]>]><[reason]><&color[<[ban.message.color]>]><&dq>."
-        - announce to_console "<&ss>4<player.name> has  temporarily banned <[name]> for <[duration].formatted_words>, for <&dq><[reason]><&dq>."
-        - flag <[player]> banned.reason:<[reason]> expire:<[duration]>
-        - flag <[player]> banned.duration:<[duration]> expire:<[duration]>
-        - kick <[player]> reason:<proc[ban_handler_proc].context[<player>]>
+        - announce to_console "<&color[<[ban.message.color]>]><player.name> has temporarily banned <[name]> for <[duration].formatted_words>, for <&dq><[reason]><&dq>."
+        - flag <[player]> dcommands.tempbanned expire:<[duration]>
+        - kick <[player]> reason:Disconnected
+        - ban <[player]> reason:<[reason]> source:<player.name.if_null[Console]> expire:<[duration]>
     - else:
         - narrate "<&[error]>Invalid duration! Examples of valid durations:"
         - narrate "<&[error]>1d, 5m, 30s"
@@ -362,11 +472,11 @@ dcommands_tempban:
 dcommands_unban:
     type: command
     name: unban
-    description: Does something
+    description: Unbans a banned player.
     usage: /unban [name]
     permission: dcommands.unban
     tab completions:
-        1: <server.online_players.parse[name]>
+        1: <server.players.filter[is_banned]>
     data:
         arguments:
             minimum: 1
@@ -374,16 +484,32 @@ dcommands_unban:
     debug: false
     script:
     - inject dcommands_inject_arguments
-    - inject dcommands_inject_player
-    - if <[player].has_flag[banned]>:
-        - flag <[player]> banned:!
+    - inject dcommands_inject_offline_player
+    - if <[player].is_banned>:
+        - flag <[player]> dcommands.banned:!
+        - flag <[player]> dcommands.tempbanned:!
+        - ban <[player]> remove
         - inject dcommands_server_definitions
-        - define unban.message <server.flag[dcommands.unban.message]>
-        - define unban.player <server.flag[dcommands.unban.player]>
+        - define unban.message <color[<script[dcommands_config].parsed_key[unban.message]>].if_null[<color[white]>]>
+        - define unban.player <color[<script[dcommands_config].parsed_key[unban.player]>].if_null[<color[<[unban.message]>]>]>
         - announce "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]> <&color[<[unban.player]>]><[player].name> <&color[<[unban.message]>]>has been unbanned!"
-        - announce to_console "<&ss>b<player.name> has unbanned <[player].name>."
+        - if <player.if_null[null]> == null:
+            - announce to_console "<&color[<[unban.message]>]><[player].name> has been unbanned by console."
+        - else:
+            - announce to_console "<&color[<[unban.message]>]><player.name> has unbanned <[player].name>."
     - else:
         - narrate "<&[error]>This player is not banned!"
+
+dcommands_inject_offline_player:
+    type: task
+    debug: false
+    script:
+    - define inject_player_color <color[<script[dcommands_config].parsed_key[inject_player.color]>].if_null[<color[white]>]>
+    - define name <context.args.first>
+    - define player <server.match_offline_player[<[name]>].if_null[null]>
+    - if <[player]> == null || <[player].name> != <[name]>:
+        - narrate <&color[<[inject_player_color]>]><script[dcommands_config].parsed_key[inject_player.message].if_null[Error parsing key!]>
+        - stop
 
 
 dcommands_invsee:
@@ -434,6 +560,9 @@ dcommands_enderchest:
     - if <[player]> == <player>:
         - inventory open d:<player.enderchest>
         - stop
+    - if !<player.has_permission[dcommands.enderchest.others]>:
+        - narrate "<&[error]>You don't have permission to do this!"
+        - stop
     - narrate "<&[warning]>Opening <[player].name>'s enderchest.."
     - inventory open d:<[player].enderchest>
 
@@ -454,25 +583,26 @@ dcommands_private:
             minimum: 2
     debug: false
     script:
-    - if <context.args.size> < <script.data_key[data.arguments.minimum]>:
-        - narrate "<&[error]>You can't send an empty message!"
-        - narrate <&[error]><script.data_key[usage]>
-        - stop
     - inject dcommands_inject_player
+    - define error.color <color[<script[dcommands_config].parsed_key[private.error.color]>].if_null[<color[white]>]>
+    - if <context.args.size> < <script.data_key[data.arguments.minimum]>:
+        - narrate <&color[<[error.color]>]><script[dcommands_config].parsed_key[private.error.empty_message].if_null[Error parsing key!]>
+        - narrate <&color[<[error.color]>]><script.data_key[usage]>
+        - stop
     - define receiver <[player]>
     - define sender <player>
     - if <[sender]> == <[receiver]>:
-        - narrate "<&[error]>You can't send messages to yourself!"
+        - narrate <&color[<[error.color]>]><script[dcommands_config].parsed_key[private.error.msg_to_yourself].if_null[Error parsing key!]>
         - stop
     - define message <context.raw_args.after[<[name]>]>
-    - flag <[sender]> dcommands.private.last:<[receiver]>
-    - flag <[receiver]> dcommands.private.last:<[sender]>
-    - define private.message <server.flag[dcommands.private.message]>
-    - define private.sender <server.flag[dcommands.private.sender]>
-    - define private.receiver <server.flag[dcommands.private.receiver]>
+    - flag <[sender]> dcommands.private:<[receiver]>
+    - flag <[receiver]> dcommands.private:<[sender]>
+    - define private.message <color[<script[dcommands_config].parsed_key[private.message]>].if_null[<color[white]>]>
+    - define private.sender <color[<script[dcommands_config].parsed_key[private.sender]>].if_null[<color[white]>]>
+    - define private.receiver <color[<script[dcommands_config].parsed_key[private.receiver]>].if_null[<color[white]>]>
     - narrate "<&7>[<&color[<[private.sender]>]><[sender].name> <&7>⇒ <&color[<[private.receiver]>]>You<&7>]<&color[<[private.message]>]><[message]>" targets:<[receiver]>
     - narrate "<&7>[<&color[<[private.receiver]>]>You <&7>⇒ <&color[<[private.sender]>]><[receiver].name><&7>]<&color[<[private.message]>]><[message]>" targets:<[sender]>
-    - announce to_console "<&ss>3<[sender].name> <&ss>7-<&gt> <&ss>3<[receiver].name><&ss>7:<&ss>b<[message]>"
+    - announce to_console "<&color[<[private.sender]>]><[sender].name> <&7>-<&gt> <&color[<[private.receiver]>]><[receiver].name><&7>:<&color[<[private.message]>]><[message]>"
 
 dcommands_private_reply:
     type: command
@@ -481,57 +611,59 @@ dcommands_private_reply:
     usage: /r [message]
     permission: dcommands.reply
     tab completions:
-        1: <list>
+        1: <empty>
     debug: false
     script:
+    - define error <color[<script[dcommands_config].parsed_key[private.reply.color]>].if_null[<color[white]>]>
     - if !<player.has_flag[dcommands.private.last]>:
-        - narrate "<&[error]>You don't have anyone to reply!"
+        - narrate <&color[<[error]>]><script[dcommands_config].parsed_key[private.reply.no_replies].if_null[Error parsing key!]>
         - stop
     - define receiver <player.flag[dcommands.private.last]>
     - define sender <player>
     - if !<[receiver].is_online>:
-        - narrate "<&[error]>The last player to message you isn't online anymore!"
+        - narrate <&color[<[error]>]><script[dcommands_config].parsed_key[private.reply.not_online].if_null[Error parsing key!]>
         - stop
     - if <context.args.is_empty>:
-        - narrate "<&[error]>Your message cannot be empty!"
+        - narrate <&color[<[error]>]><script[dcommands_config].parsed_key[private.reply.empty].if_null[Error parsing key!]>
         - stop
     - define message <context.raw_args>
-    - flag <[sender]> dcommands.private.last:<[receiver]>
-    - flag <[receiver]> dcommands.private.last:<[sender]>
-    - define private.message <server.flag[dcommands.private.message]>
-    - define private.sender <server.flag[dcommands.private.sender]>
-    - define private.receiver <server.flag[dcommands.private.receiver]>
+    - flag <[sender]> dcommands.private:<[receiver]>
+    - flag <[receiver]> dcommands.private:<[sender]>
+    - define private.message <color[<script[dcommands_config].parsed_key[private.message]>].if_null[<color[white]>]>
+    - define private.sender <color[<script[dcommands_config].parsed_key[private.sender]>].if_null[<color[white]>]>
+    - define private.receiver <color[<script[dcommands_config].parsed_key[private.receiver]>].if_null[<color[white]>]>
     - narrate "<&7>[<&color[<[private.sender]>]><[sender].name> <&7>⇒ <&color[<[private.receiver]>]>You<&7>]<&color[<[private.message]>]> <[message]>" targets:<[receiver]>
     - narrate "<&7>[<&color[<[private.receiver]>]>You <&7>⇒ <&color[<[private.sender]>]><[receiver].name><&7>]<&color[<[private.message]>]> <[message]>" targets:<[sender]>
-    - announce to_console "<&ss>3<[sender].name> <&ss>7-<&gt> <&ss>3<[receiver].name><&ss>7:<&ss>b <[message]>"
+    - announce to_console "<&color[<[private.sender]>]><[sender].name> <&7>-<&gt> <&color[<[private.receiver]>]><[receiver].name><&7>:<&color[<[private.message]>]><[message]>"
 
 dcommands_reply_cleaner:
     type: world
     debug: false
     events:
         on player quits:
-        - flag <player> dcommands.private.last:!
+        - flag <player> dcommands.private:!
 
 
 dcommands_clearchat:
     type: command
     name: clearchat
-    description: Does something
+    description: Cleans up the chat, leaving a custom message behind.
     usage: /clearchat
     permission: dcommands.clearchat
     tab completions:
-        1: <list>
+        1: <empty>
     data:
         arguments:
             single: true
     debug: false
     script:
     - inject dcommands_inject_arguments
-    - repeat 10:
-        - announce <&nl><&nl><&nl><&nl><&nl><&nl><&nl><&nl><&nl><&nl><&nl><&nl><&nl><&nl><&nl><&nl><&nl><&nl><&nl><&nl><&nl><&nl><&nl>
+    - announce <&nl.repeat[100]>
     - inject dcommands_server_definitions
-    - announce "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&color[<[global_message_color]>]> Chat was cleared."
-    - announce to_console "<&ss>bChat was cleared by <player.name>."
+    - define message <script[dcommands_config].parsed_key[clearchat.message].if_null[Error parsing key!]>
+    - define color <color[<script[dcommands_config].parsed_key[clearchat.color]>].if_null[<color[white]>]>
+    - announce "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&color[<[color]>]> <[message]>"
+    - announce to_console "<&color[<[color]>]>Chat was cleared by <player.name>."
 
 
 dcommands_dcommands:
@@ -541,7 +673,7 @@ dcommands_dcommands:
     usage: /dcommands
     permission: dcommands.dcommands
     tab completions:
-        1: <list>
+        1: <empty>
     data:
         arguments:
             single: true
@@ -550,76 +682,46 @@ dcommands_dcommands:
     - inject dcommands_inject_arguments
     - define commands <util.scripts.filter[container_type.equals[COMMAND]]>
     - define path <script.relative_filename>
-    - define dcommands.disabled <[commands].filter[data_key[enabled].equals[false]]>
+    - define dcommands.disabled <[commands].filter[data_key[enabled].not]>
     - define dcommands.raw <[commands].filter[relative_filename.equals[<[path]>]].exclude[<[dcommands.disabled]>]>
     - define dcommands.name <[dcommands.raw].parse[data_key[name]]>
-    - define dcommands.header.text <server.flag[dcommands.dcommands.header.text]>
-    - define dcommands.header.color <server.flag[dcommands.dcommands.header.color]>
-    - define dcommands.separator.symbol <server.flag[dcommands.dcommands.separator.symbol]>
-    - define dcommands.separator.color <server.flag[dcommands.dcommands.separator.color]>
-    - define dcommands.commands <server.flag[dcommands.dcommands.commands]>
+    - define dcommands.header.text <script[dcommands_config].parsed_key[dcommands.header.text].if_null[Error parsing key!]>
+    - define dcommands.header.color <color[<script[dcommands_config].parsed_key[dcommands.header.color]>].if_null[<color[white]>]>
+    - define dcommands.separator.symbol <script[dcommands_config].parsed_key[dcommands.separator.symbol].if_null[Error parsing key!]>
+    - define dcommands.separator.color <color[<script[dcommands_config].parsed_key[dcommands.separator.color]>].if_null[<color[white]>]>
+    - define dcommands.commands <color[<script[dcommands_config].parsed_key[dcommands.commands]>].if_null[<[dcommands.header.color]>]>
     - narrate <&color[<[dcommands.header.color]>]><[dcommands.header.text]>
     - narrate "<&color[<[dcommands.separator.color]>]><[dcommands.separator.symbol]> <&color[<[dcommands.commands]>]><[dcommands.name].alphabetical.separated_by[<&nl><&color[<[dcommands.separator.color]>]><[dcommands.separator.symbol]> <&color[<[dcommands.commands]>]>]>"
-    - if <player.is_op>:
-        - if <script[dcommands_config].data_key[dcommands.show_disabled_dcommands]>:
+    - if <player.has_permission[dcommands.dcommands.see_disabled_commands]>:
+        - if <script[dcommands_config].data_key[dcommands.dcommands.show_disabled_dcommands]>:
             - if <[dcommands.disabled].is_empty>:
                 - stop
             - narrate "<&7>Disabled dCommands:"
             - narrate "<&8><[dcommands.separator.symbol]> <&7><[dcommands.disabled].parse[data_key[name]].alphabetical.separated_by[<&nl><&8><[dcommands.separator.symbol]> <&7>]>"
 
-dcommands_load_definitions:
-    type: world
+dcommands_ban_definitions:
+    type: task
     debug: false
-    events:
-        after scripts loaded:
-        - flag server restarting:!
-        - flag server dcommands:!
-        - flag server dcommands.server.prefix:<script[dcommands_config].data_key[server.prefix].parsed>
-        - flag server dcommands.server.suffix:<script[dcommands_config].data_key[server.suffix].parsed>
-        - flag server dcommands.server.name:<script[dcommands_config].data_key[server.name].parsed>
-        - flag server dcommands.server.color:<color[<script[dcommands_config].data_key[server.color].parsed>].if_null[<color[white]>]>
-        - flag server dcommands.global_message_color:<color[<script[dcommands_config].data_key[global_message_color].parsed>].if_null[<color[white]>]>
-        - flag server dcommands.ban.message.perma:<script[dcommands_config].data_key[ban.message.perma].parsed>
-        - flag server dcommands.ban.message.temp.header:<script[dcommands_config].data_key[ban.message.temp.header].parsed>
-        - flag server dcommands.ban.message.temp.footer:<script[dcommands_config].data_key[ban.message.temp.footer].parsed>
-        - flag server dcommands.ban.message.color:<color[<script[dcommands_config].data_key[ban.message.color].parsed>].if_null[<server.flag[dcommands.server.color]>]>
-        - flag server dcommands.ban.value:<color[<script[dcommands_config].data_key[ban.value].parsed>].if_null[<color[white]>]>
-        - flag server dcommands.unban.message:<color[<script[dcommands_config].data_key[unban.message].parsed>].if_null[<color[white]>]>
-        - flag server dcommands.unban.player:<color[<script[dcommands_config].data_key[unban.player].parsed>].if_null[<color[<server.flag[dcommands.unban.message]>]>]>
-        - flag server dcommands.private.message:<color[<script[dcommands_config].data_key[private.message].parsed>].if_null[<color[white]>]>
-        - flag server dcommands.private.sender:<color[<script[dcommands_config].data_key[private.sender].parsed>].if_null[<color[white]>]>
-        - flag server dcommands.private.receiver:<color[<script[dcommands_config].data_key[private.receiver].parsed>].if_null[<color[white]>]>
-        - wait 0.01s
-        - flag server dcommands.dcommands.header.text:<script[dcommands_config].data_key[dcommands.header.text].parsed>
-        - flag server dcommands.dcommands.header.color:<color[<script[dcommands_config].data_key[dcommands.header.color].parsed>].if_null[<color[white]>]>
-        - flag server dcommands.dcommands.separator.symbol:<script[dcommands_config].data_key[dcommands.separator.symbol].parsed>
-        - flag server dcommands.dcommands.separator.color:<color[<script[dcommands_config].data_key[dcommands.separator.color].parsed>].if_null[<color[white]>]>
-        - flag server dcommands.dcommands.commands:<color[<script[dcommands_config].data_key[dcommands.commands].parsed>].if_null[<server.flag[dcommands.dcommands.header.color]>]>
-        - flag server dcommands.heal.message.self:<script[dcommands_config].data_key[heal.message.self].parsed>
-        - flag server dcommands.heal.message.another.theirs:<script[dcommands_config].data_key[heal.message.another.theirs].parsed>
-        - flag server dcommands.heal.message.another.yours:<script[dcommands_config].data_key[heal.message.another.yours].parsed>
-        - flag server dcommands.heal.message.color:<color[<script[dcommands_config].data_key[heal.message.color].parsed>].if_null[<color[white]>]>
-        - flag server dcommands.heal.numbers:<color[<script[dcommands_config].data_key[heal.numbers].parsed>].if_null[<color[white]>]>
-        - flag server dcommands.heal.separator.symbol:<script[dcommands_config].data_key[heal.separator.symbol].parsed>
-        - flag server dcommands.heal.separator.color:<color[<script[dcommands_config].data_key[heal.separator.color].parsed>].if_null[<server.flag[dcommands.heal.message.color]>]>
-        - flag server dcommands.feed.color:<color[<script[dcommands_config].data_key[feed.color].parsed>].if_null[<color[white]>]>
-        - flag server dcommands.feed.message.self:<script[dcommands_config].data_key[feed.message.self].parsed>
-        - flag server dcommands.feed.message.another:<script[dcommands_config].data_key[feed.message.another].parsed>
+    script:
+    - define ban.message.perma <script[dcommands_config].parsed_key[ban.message.perma].if_null[Error parsing key!]>
+    - define ban.message.temp.header <script[dcommands_config].parsed_key[ban.message.temp.header].if_null[Error parsing key!]>
+    - define ban.message.temp.footer <script[dcommands_config].parsed_key[ban.message.temp.footer].if_null[Error parsing key!]>
+    - define ban.message.color <color[<script[dcommands_config].parsed_key[ban.message.color]>].if_null[<[server.color]>]>
+    - define ban.value <color[<script[dcommands_config].parsed_key[ban.value]>].if_null[<color[white]>]>
 
 dcommands_server_definitions:
     type: task
     debug: false
     script:
-    - define server.prefix <server.flag[dcommands.server.prefix]>
-    - define server.suffix <server.flag[dcommands.server.suffix]>
-    - define server.name <server.flag[dcommands.server.name]>
-    - define server.color <server.flag[dcommands.server.color]>
-    - define global_message_color <server.flag[dcommands.global_message_color]>
+    - define server.prefix <script[dcommands_config].parsed_key[server.prefix].if_null[Error parsing key!]>
+    - define server.suffix <script[dcommands_config].parsed_key[server.suffix].if_null[Error parsing key!]>
+    - define server.name <script[dcommands_config].parsed_key[server.name].if_null[Error parsing key!]>
+    - define server.color <color[<script[dcommands_config].parsed_key[server.color]>].if_null[<color[white]>]>
 
 dcommands_gmc:
     type: command
     name: gmc
-    description: Creative mode.
+    description: Creative mode shortcut.
     usage: /gmc (player)
     permission: dcommands.gmc
     tab completions:
@@ -631,29 +733,33 @@ dcommands_gmc:
     debug: false
     script:
     - inject dcommands_inject_arguments
+    - define color <color[<script[dcommands_config].parsed_key[gamemode.creative.color]>].if_null[<color[white]>]>
     - if <context.args.is_empty>:
         - if <player.gamemode> == creative:
             - stop
         - else:
             - adjust <player> gamemode:creative
-            - narrate "<&[warning]>Gamemode set to creative."
+            - narrate <&color[<[color]>]><script[dcommands_config].parsed_key[gamemode.creative.self].if_null[Error parsing key!]>
+        - stop
+    - if !<player.has_permission[dcommands.gmc.others]>:
+        - narrate "<&[error]>You don't have permission to do this!"
         - stop
     - inject dcommands_inject_player
     - if <[player]> == <player>:
         - adjust <player> gamemode:creative
-        - narrate "<&[warning]>Gamemode set to creative."
+        - narrate <&color[<[color]>]><script[dcommands_config].parsed_key[gamemode.creative.self]>
         - stop
     - if <[player].gamemode> == creative:
         - stop
     - else:
         - adjust <[player]> gamemode:creative
-        - narrate "<&[warning]>Set <[player].name>'s gamemode to creative."
-        - narrate "<&[warning]>Gamemode set to creative by an admin." targets:<[player]>
+        - narrate "<&color[<[color]>]>Set <[player].name>'s gamemode to creative."
+        - narrate <&color[<[color]>]><script[dcommands_config].parsed_key[gamemode.creative.another]> targets:<[player]>
 
 dcommands_gms:
     type: command
     name: gms
-    description: Survival mode.
+    description: Survival mode shortcut.
     usage: /gms (player)
     permission: dcommands.gms
     tab completions:
@@ -665,29 +771,33 @@ dcommands_gms:
     debug: false
     script:
     - inject dcommands_inject_arguments
+    - define color <color[<script[dcommands_config].parsed_key[gamemode.survival.color]>].if_null[<color[white]>]>
     - if <context.args.is_empty>:
         - if <player.gamemode> == survival:
             - stop
         - else:
             - adjust <player> gamemode:survival
-            - narrate "<&[warning]>Gamemode set to survival."
+            - narrate <&color[<[color]>]><script[dcommands_config].parsed_key[gamemode.survival.self].if_null[Error parsing key!]>
+        - stop
+    - if !<player.has_permission[dcommands.gms.others]>:
+        - narrate "<&[error]>You don't have permission to do this!"
         - stop
     - inject dcommands_inject_player
     - if <[player]> == <player>:
         - adjust <player> gamemode:survival
-        - narrate "<&[warning]>Gamemode set to survival."
+        - narrate <&color[<[color]>]><script[dcommands_config].parsed_key[gamemode.survival.self].if_null[Error parsing key!]>
         - stop
     - if <[player].gamemode> == survival:
         - stop
     - else:
         - adjust <[player]> gamemode:survival
-        - narrate "<&[warning]>Set <[player].name>'s gamemode to survival."
-        - narrate "<&[warning]>Gamemode set to survival by an admin." targets:<[player]>
+        - narrate "<&color[<[color]>]>Set <[player].name>'s gamemode to survival."
+        - narrate <&color[<[color]>]><script[dcommands_config].parsed_key[gamemode.survival.another].if_null[Error parsing key!]> targets:<[player]>
 
 dcommands_gmsp:
     type: command
     name: gmsp
-    description: Spectator mode.
+    description: Spectator mode shortcut.
     usage: /gmsp (player)
     permission: dcommands.gmsp
     tab completions:
@@ -699,29 +809,33 @@ dcommands_gmsp:
     debug: false
     script:
     - inject dcommands_inject_arguments
+    - define color <color[<script[dcommands_config].parsed_key[gamemode.survival.color]>].if_null[<color[white]>]>
     - if <context.args.is_empty>:
         - if <player.gamemode> == spectator:
             - stop
         - else:
             - adjust <player> gamemode:spectator
-            - narrate "<&[warning]>Gamemode set to spectator."
+            - narrate <&color[<[color]>]><script[dcommands_config].parsed_key[gamemode.spectator.self].if_null[Error parsing key!]>
+        - stop
+    - if !<player.has_permission[dcommands.gmsp.others]>:
+        - narrate "<&[error]>You don't have permission to do this!"
         - stop
     - inject dcommands_inject_player
     - if <[player]> == <player>:
         - adjust <player> gamemode:spectator
-        - narrate "<&[warning]>Gamemode set to spectator."
+        - narrate <&color[<[color]>]><script[dcommands_config].parsed_key[gamemode.spectator.self].if_null[Error parsing key!]>
         - stop
     - if <[player].gamemode> == spectator:
         - stop
     - else:
         - adjust <[player]> gamemode:spectator
-        - narrate "<&[warning]>Set <[player].name>'s gamemode to spectator."
-        - narrate "<&[warning]>Gamemode set to spectator by an admin." targets:<[player]>
+        - narrate "<&color[<[color]>]>Set <[player].name>'s gamemode to spectator."
+        - narrate <&color[<[color]>]><script[dcommands_config].parsed_key[gamemode.spectator.another].if_null[Error parsing key!]> targets:<[player]>
 
 dcommands_gma:
     type: command
     name: gma
-    description: Adventure mode.
+    description: Adventure mode shortcut.
     usage: /gma (player)
     permission: dcommands.gma
     tab completions:
@@ -733,24 +847,28 @@ dcommands_gma:
     debug: false
     script:
     - inject dcommands_inject_arguments
+    - define color <color[<script[dcommands_config].parsed_key[gamemode.survival.color]>].if_null[<color[white]>]>
     - if <context.args.is_empty>:
         - if <player.gamemode> == adventure:
             - stop
         - else:
             - adjust <player> gamemode:adventure
-            - narrate "<&[warning]>Gamemode set to adventure."
+            - narrate <&color[<[color]>]><script[dcommands_config].parsed_key[gamemode.adventure.self].if_null[Error parsing key!]>
+        - stop
+    - if !<player.has_permission[dcommands.gma.others]>:
+        - narrate "<&[error]>You don't have permission to do this!"
         - stop
     - inject dcommands_inject_player
     - if <[player]> == <player>:
         - adjust <player> gamemode:adventure
-        - narrate "<&[warning]>Gamemode set to adventure."
+        - narrate <&color[<[color]>]><script[dcommands_config].parsed_key[gamemode.adventure.self].if_null[Error parsing key!]>
         - stop
     - if <[player].gamemode> == adventure:
         - stop
     - else:
         - adjust <[player]> gamemode:adventure
-        - narrate "<&[warning]>Set <[player].name>'s gamemode to adventure."
-        - narrate "<&[warning]>Gamemode set to adventure by an admin." targets:<[player]>
+        - narrate "<&color[<[color]>]>Set <[player].name>'s gamemode to adventure."
+        - narrate <&color[<[color]>]><script[dcommands_config].parsed_key[gamemode.adventure.another].if_null[Error parsing key!]> targets:<[player]>
 
 dcommands_heal:
     type: command
@@ -767,11 +885,11 @@ dcommands_heal:
     debug: false
     script:
     - inject dcommands_inject_arguments
-    - define heal.message.self <server.flag[dcommands.heal.message.self]>
-    - define heal.message.color <server.flag[dcommands.heal.message.color]>
-    - define heal.numbers <server.flag[dcommands.heal.numbers]>
-    - define heal.separator.symbol <server.flag[dcommands.heal.separator.symbol]>
-    - define heal.separator.color <server.flag[dcommands.heal.separator.color]>
+    - define heal.message.self <script[dcommands_config].parsed_key[heal.message.self].if_null[Error parsing key!]>
+    - define heal.message.color <color[<script[dcommands_config].parsed_key[heal.message.color]>].if_null[<color[white]>]>
+    - define heal.numbers <color[<script[dcommands_config].parsed_key[heal.numbers]>].if_null[<color[white]>]>
+    - define heal.separator.symbol <script[dcommands_config].parsed_key[heal.separator.symbol].if_null[Error parsing key!]>
+    - define heal.separator.color <color[<script[dcommands_config].parsed_key[heal.separator.color]>].if_null[<[heal.message.color]>]>
     - if <context.args.is_empty>:
         - define health <player.health.round_to_precision[0.5]>
         - define maxhealth <player.health_max>
@@ -779,6 +897,9 @@ dcommands_heal:
         - heal <player>
         - narrate <&color[<[heal.message.color]>]><[heal.message.self]>
         - narrate "<&color[<[heal.numbers]>]><[health]> <&color[<[heal.separator.color]>]><[heal.separator.symbol]> <&color[<[heal.numbers]>]><[maxhealth]>"
+        - stop
+    - if !<player.has_permission[dcommands.heal.others]>:
+        - narrate "<&[error]>You don't have permission to do this!"
         - stop
     - inject dcommands_inject_player
     - if <[player]> == <player>:
@@ -790,8 +911,8 @@ dcommands_heal:
         - narrate "<&color[<[heal.numbers]>]><[health]> <&color[<[heal.separator.color]>]><[heal.separator.symbol]> <&color[<[heal.numbers]>]><[maxhealth]>"
         - stop
     - else:
-        - define heal.message.another.theirs <server.flag[dcommands.heal.message.another.theirs]>
-        - define heal.message.another.yours <server.flag[dcommands.heal.message.another.yours]>
+        - define heal.message.another.theirs <script[dcommands_config].parsed_key[heal.message.another.theirs].if_null[Error parsing key!]>
+        - define heal.message.another.yours <script[dcommands_config].parsed_key[heal.message.another.yours].if_null[Error parsing key!]>
         - define health <[player].health.round_to_precision[0.5]>
         - define maxhealth <[player].health_max>
         - heal <[player]>
@@ -816,12 +937,15 @@ dcommands_feed:
     debug: false
     script:
     - inject dcommands_inject_arguments
-    - define feed.color <server.flag[dcommands.feed.color]>
-    - define feed.message.self <server.flag[dcommands.feed.message.self]>
-    - define feed.message.another <server.flag[dcommands.feed.message.another]>
+    - define feed.color <color[<script[dcommands_config].parsed_key[feed.color]>].if_null[<color[white]>]>
+    - define feed.message.self <script[dcommands_config].parsed_key[feed.message.self].if_null[Error parsing key!]>
+    - define feed.message.another <script[dcommands_config].parsed_key[feed.message.another].if_null[Error parsing key!]>
     - if <context.args.is_empty>:
         - feed <player>
         - narrate <&color[<[feed.color]>]><[feed.message.self]>
+        - stop
+    - if !<player.has_permission[dcommands.feed.others]>:
+        - narrate "<&[error]>You don't have permission to do this!"
         - stop
     - inject dcommands_inject_player
     - if <[player]> == <player>:
@@ -843,19 +967,20 @@ dcommands_vanish:
     - invis
     - v
     tab completions:
-        1: <list>
+        1: <empty>
     data:
         arguments:
             single: true
     debug: false
     script:
     - inject dcommands_inject_arguments
+    - define color <color[<script[dcommands_config].parsed_key[vanish.message.color]>].if_null[<color[white]>]>
     - if <player.visible>:
-        - narrate "<&[warning]>You are now vanished."
+        - narrate <&color[<[color]>]><script[dcommands_config].parsed_key[vanish.message.on].if_null[Error parsing key!]>
         - adjust <player> visible:false
         - adjust <player> invulnerable:true
     - else:
-        - narrate "<&[warning]>You are no longer vanished."
+        - narrate <&color[<[color]>]><script[dcommands_config].parsed_key[vanish.message.off].if_null[Error parsing key!]>
         - adjust <player> visible:true
         - adjust <player> invulnerable:false
 
@@ -867,18 +992,19 @@ dcommands_fly:
     usage: /fly
     permission: dcommands.fly
     tab completions:
-        1: <list>
+        1: <empty>
     data:
         arguments:
             single: true
     debug: false
     script:
     - inject dcommands_inject_arguments
+    - define color <color[<script[dcommands_config].parsed_key[fly.message.color]>].if_null[<color[white]>]>
     - if !<player.can_fly>:
-        - narrate "<&[warning]>Fly mode turned on, at speed <player.fly_speed.mul[10]>."
+        - narrate <&color[<[color]>]><script[dcommands_config].parsed_key[fly.message.on]>
         - adjust <player> can_fly:true
     - else:
-        - narrate "<&[warning]>Fly mode turned off."
+        - narrate <&color[<[color]>]><script[dcommands_config].parsed_key[fly.message.off]>
         - adjust <player> can_fly:false
 
 
@@ -886,21 +1012,31 @@ dcommands_inject_arguments:
     type: task
     debug: false
     script:
+    - definemap inject_argument_color:
+        not_enough: <color[<script[dcommands_config].parsed_key[arguments.not_enough.color]>].if_null[<color[white]>]>
+        too_many: <color[<script[dcommands_config].parsed_key[arguments.too_many.color]>].if_null[<color[white]>]>
+        command_info:
+            usage: <color[<script[dcommands_config].parsed_key[arguments.command_info.usage]>].if_null[<color[white]>]>
+            description: <color[<script[dcommands_config].parsed_key[arguments.command_info.description]>].if_null[<color[white]>]>
+            message: <color[<script[dcommands_config].parsed_key[arguments.command_info.message]>].if_null[<color[white]>]>
     - define minarg <queue.script.data_key[data.arguments.minimum].if_null[null]>
     - define maxarg <queue.script.data_key[data.arguments.maximum].if_null[null]>
     - define single <queue.script.data_key[data.arguments.single].if_null[null]>
     - if <[single]> != null:
         - if !<context.args.is_empty>:
-            - narrate "<&[error]>Incorrect usage!"
+            - narrate <&color[<[color.too_many]>]><script[dcommands_config].parsed_key[arguments.too_many.message].if_null[Error parsing key!]>
             - inject dcommands_inject_message
             - stop
     - else:
+        - if <[minarg]> == null || <[maxarg]> == null:
+            - narrate "<&4>Invalid minimum or maximum argument count! Contact the server developer."
+            - stop
         - if <context.args.size> < <[minarg]>:
-            - narrate "<&[error]>Not enough arguments! Correct usage:"
+            - narrate <&color[<[inject_argument_color.not_enough]>]><script[dcommands_config].parsed_key[arguments.not_enough.message].if_null[Error parsing key!]>
             - inject dcommands_inject_message
             - stop
         - if <context.args.size> > <[maxarg]>:
-            - narrate "<&[error]>Too many arguments! Correct usage:"
+            - narrate <&color[<[inject_argument_color.too_many]>]><script[dcommands_config].parsed_key[arguments.too_many.message].if_null[Error parsing key!]>
             - inject dcommands_inject_message
             - stop
 
@@ -908,20 +1044,21 @@ dcommands_inject_message:
     type: task
     debug: false
     script:
-    - narrate <&[error]><queue.script.data_key[usage].if_null[null]>
-    - narrate <&[base]><queue.script.data_key[description].parsed.if_null[null]>
-    - define message <queue.script.data_key[data.arguments.message].if_null[null]>
+    - narrate <&color[<[inject_argument_color.command_info.usage]>]><queue.script.parsed_key[usage].if_null[Error parsing key!]>
+    - narrate <&color[<[inject_argument_color.command_info.description]>]><queue.script.parsed_key[description].if_null[Error parsing key!]>
+    - define message <queue.script.parsed_key[data.arguments.message].if_null[null]>
     - if <[message]> != null:
-        - narrate <&[emphasis]><[message].parsed>
+        - narrate <&color[<[inject_argument_color.command_info.message]>]><[message]>
 
 dcommands_inject_player:
     type: task
     debug: false
     script:
+    - define inject_player_color <color[<script[dcommands_config].parsed_key[inject_player.color]>].if_null[<color[white]>]>
     - define name <context.args.first>
     - define player <server.match_player[<[name]>].if_null[null]>
-    - if ( <[player]> == null ) || ( <[player].name> != <[name]> ):
-        - narrate "<&[error]>Player not found!"
+    - if <[player]> == null || <[player].name> != <[name]>:
+        - narrate <&color[<[inject_player_color]>]><script[dcommands_config].parsed_key[inject_player.message].if_null[Error parsing key!]>
         - stop
 
 
@@ -951,9 +1088,9 @@ dcommands_smite:
         - narrate "<&[error]>Delay must be a number!"
         - stop
     - define delay <duration[<[delay]>]>
-    - narrate <[quantity]>
-    - narrate <[delay]>
     - repeat <[quantity]>:
+        - if <script[dcommands_config].data_key[smite.warn_target.enabled]>:
+            - narrate <&color[<color[<script[dcommands_config].parsed_key[smite.warn_target.color]>].if_null[<color[white]>]>]><script[dcommands_config].parsed_key[smite.warn_target.message]> targets:<[player]>
         - strike <[player].location>
         - wait <[delay]>
 
@@ -967,18 +1104,21 @@ dcommands_godmode:
     - invulnerable
     permission: dcommands.godmode
     tab completions:
-        1: <list>
+        1: <empty>
     data:
         arguments:
             single: true
     debug: false
     script:
     - inject dcommands_inject_arguments
+    - definemap godmodecolor:
+        on: <color[<script[dcommands_config].parsed_key[godmode.on.color]>].if_null[<color[white]>]>
+        off: <color[<script[dcommands_config].parsed_key[godmode.off.color]>].if_null[<color[white]>]>
     - if !<player.invulnerable>:
-        - narrate "<&[warning]>God mode turned on."
+        - narrate <&color[<[godmodecolor.on]>]><script[dcommands_config].parsed_key[godmode.on.message].if_null[Error parsing key!]>
         - adjust <player> invulnerable:true
     - else:
-        - narrate "<&[warning]>God mode turned off."
+        - narrate <&color[<[godmodecolor.off]>]><script[dcommands_config].parsed_key[godmode.off.message].if_null[Error parsing key!]>
         - adjust <player> invulnerable:false
 
 dcommands_speed:
@@ -989,7 +1129,7 @@ dcommands_speed:
     permission: dcommands.speed
     tab completions:
         1: fly|walk
-        2: <list>
+        2: <empty>
     data:
         arguments:
             minimum: 1
@@ -1011,8 +1151,8 @@ dcommands_speed:
         - choose <[msg]>:
             - case Walk:
                 - narrate "<&[base]>Your walking speed is set at <&[emphasis]><player.walk_speed><&[base]>!"
-            - case fly:
-                - narrate "<&[base]>Your walking speed is set at <&[emphasis]><player.fly_speed><&[base]>!"
+            - case Flying:
+                - narrate "<&[base]>Your flying speed is set at <&[emphasis]><player.fly_speed><&[base]>!"
             - default:
                 - narrate "<&[error]>If you saw this message, the author did a fuckie wuckie somewhere! Please contact!"
     - else:
