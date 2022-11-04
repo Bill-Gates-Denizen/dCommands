@@ -615,10 +615,10 @@ dcommands_private_reply:
     debug: false
     script:
     - define error <color[<script[dcommands_config].parsed_key[private.reply.color]>].if_null[<color[white]>]>
-    - if !<player.has_flag[dcommands.private.last]>:
+    - if !<player.has_flag[dcommands.private]>:
         - narrate <&color[<[error]>]><script[dcommands_config].parsed_key[private.reply.no_replies].if_null[Error parsing key!]>
         - stop
-    - define receiver <player.flag[dcommands.private.last]>
+    - define receiver <player.flag[dcommands.private]>
     - define sender <player>
     - if !<[receiver].is_online>:
         - narrate <&color[<[error]>]><script[dcommands_config].parsed_key[private.reply.not_online].if_null[Error parsing key!]>
