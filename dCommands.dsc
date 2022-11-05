@@ -334,7 +334,7 @@ dcommands_enchant:
     type: command
     name: enchant
     description: Enchants the item in your hand up to level 255, or removes enchantments from it.
-    usage: /enchant [enchantment] (level / remove)
+    usage: /enchant [enchantment] (level | remove)
     permission: dcommands.enchant
     tab completions:
         1: <server.enchantments.parse[name]>
@@ -693,7 +693,7 @@ dcommands_dcommands:
     - narrate <&color[<[dcommands.header.color]>]><[dcommands.header.text]>
     - narrate "<&color[<[dcommands.separator.color]>]><[dcommands.separator.symbol]> <&color[<[dcommands.commands]>]><[dcommands.name].alphabetical.separated_by[<&nl><&color[<[dcommands.separator.color]>]><[dcommands.separator.symbol]> <&color[<[dcommands.commands]>]>]>"
     - if <player.has_permission[dcommands.dcommands.see_disabled_commands]>:
-        - if <script[dcommands_config].data_key[dcommands.dcommands.show_disabled_dcommands]>:
+        - if <script[dcommands_config].data_key[dcommands.show_disabled_dcommands]>:
             - if <[dcommands.disabled].is_empty>:
                 - stop
             - narrate "<&7>Disabled dCommands:"
