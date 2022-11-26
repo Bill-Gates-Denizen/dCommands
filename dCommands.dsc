@@ -46,7 +46,7 @@ dcommands_config:
         # The time will be automatically added after the message, don't try to add it yourself!
         message: Restarting server in
         color: <dark_red>
-        end: Server restarting.
+        end: Restarting server.
 
     enchant:
         # These are specific error messages that will be shown under specific conditions. All of them will share the same color.
@@ -303,7 +303,9 @@ dcommands_restart:
         - wait 5s
         - announce "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&color[<[restart.color]>]> <[restart.message]> 5 seconds."
         - announce to_console "<&color[<[restart.color]>]><[restart.message]> 5 seconds."
-        - wait 5s
+        - wait 4s
+        - flag server dcommands.restarting:!
+        - wait 1s
         - adjust server restart
         - stop
     - define duration <duration[<context.args.first>].if_null[null]>
@@ -321,8 +323,9 @@ dcommands_restart:
             - define duration <[duration].round_up_to_precision[0.1]>
         - if <[duration]> <= 1:
             - wait 1s
-            - announce <[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&color[<[restart.color]>]> <[restart.end]>
-            - announce to_console <&color[<[restart.color]>]> <[restart.end]>
+            - announce "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&color[<[restart.color]>]> <[restart.end]>"
+            - announce to_console "<&color[<[restart.color]>]> <[restart.end]>"
+            - flag server dcommands.restarting:!
             - wait 1s
             - adjust server restart
             - stop
@@ -389,7 +392,7 @@ dcommands_ban_proc:
     script:
     - inject dcommands_server_definitions
     - inject dcommands_ban_definitions
-    - determine "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&nl><&color[<[ban.message.color]>]><[ban.message.perma]><&nl><&nl><&color[<[ban.message.color]>]>Reason: <&color[<[ban.value]>]><[reason]>"
+    - determine "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><n><&color[<[ban.message.color]>]><[ban.message.perma]><n><n><&color[<[ban.message.color]>]>Reason: <&color[<[ban.value]>]><[reason]>"
 
 dcommands_tempban_proc:
     type: procedure
@@ -398,7 +401,7 @@ dcommands_tempban_proc:
     script:
     - inject dcommands_server_definitions
     - inject dcommands_ban_definitions
-    - determine "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><&nl><&color[<[ban.message.color]>]><[ban.message.temp.header]><&nl><&nl><&color[<[ban.message.color]>]>Reason: <&color[<[ban.value]>]><[reason]><&nl><&color[<[ban.message.color]>]><[ban.message.temp.footer]> <&color[<[ban.value]>]><[expiration].format>"
+    - determine "<[server.prefix]><&color[<[server.color]>]><[server.name]><&r><[server.suffix]><n><&color[<[ban.message.color]>]><[ban.message.temp.header]><n><n><&color[<[ban.message.color]>]>Reason: <&color[<[ban.value]>]><[reason]><n><&color[<[ban.message.color]>]><[ban.message.temp.footer]> <&color[<[ban.value]>]><[expiration].format>"
 
 dcommands_ban:
     type: command
@@ -658,7 +661,7 @@ dcommands_clearchat:
     debug: false
     script:
     - inject dcommands_inject_arguments
-    - announce <&nl.repeat[100]>
+    - announce <n.repeat[100]>
     - inject dcommands_server_definitions
     - define message <script[dcommands_config].parsed_key[clearchat.message].if_null[Error parsing key!]>
     - define color <color[<script[dcommands_config].parsed_key[clearchat.color]>].if_null[<color[white]>]>
@@ -691,13 +694,13 @@ dcommands_dcommands:
     - define dcommands.separator.color <color[<script[dcommands_config].parsed_key[dcommands.separator.color]>].if_null[<color[white]>]>
     - define dcommands.commands <color[<script[dcommands_config].parsed_key[dcommands.commands]>].if_null[<[dcommands.header.color]>]>
     - narrate <&color[<[dcommands.header.color]>]><[dcommands.header.text]>
-    - narrate "<&color[<[dcommands.separator.color]>]><[dcommands.separator.symbol]> <&color[<[dcommands.commands]>]><[dcommands.name].alphabetical.separated_by[<&nl><&color[<[dcommands.separator.color]>]><[dcommands.separator.symbol]> <&color[<[dcommands.commands]>]>]>"
+    - narrate "<&color[<[dcommands.separator.color]>]><[dcommands.separator.symbol]> <&color[<[dcommands.commands]>]><[dcommands.name].alphabetical.separated_by[<n><&color[<[dcommands.separator.color]>]><[dcommands.separator.symbol]> <&color[<[dcommands.commands]>]>]>"
     - if <player.has_permission[dcommands.dcommands.see_disabled_commands]>:
         - if <script[dcommands_config].data_key[dcommands.show_disabled_dcommands]>:
             - if <[dcommands.disabled].is_empty>:
                 - stop
             - narrate "<&7>Disabled dCommands:"
-            - narrate "<&8><[dcommands.separator.symbol]> <&7><[dcommands.disabled].parse[data_key[name]].alphabetical.separated_by[<&nl><&8><[dcommands.separator.symbol]> <&7>]>"
+            - narrate "<&8><[dcommands.separator.symbol]> <&7><[dcommands.disabled].parse[data_key[name]].alphabetical.separated_by[<n><&8><[dcommands.separator.symbol]> <&7>]>"
 
 dcommands_ban_definitions:
     type: task
@@ -1124,7 +1127,7 @@ dcommands_godmode:
 dcommands_speed:
     type: command
     name: speed
-    description: Changes your walking or flying speed. Default speed for both is 1.
+    description: Changes your walking or flying speed.
     usage: /speed [fly | walk] (speed)
     permission: dcommands.speed
     tab completions:
@@ -1139,27 +1142,101 @@ dcommands_speed:
     - inject dcommands_inject_arguments
     - choose <context.args.first>:
         - case walk:
-            - define type walk_speed
-            - define msg Walk
+            - define msg Walking
         - case fly:
-            - define type fly_speed
             - define msg Flying
         - default:
             - inject dcommands_inject_message
             - stop
     - if <context.args.size> == 1:
         - choose <[msg]>:
-            - case Walk:
+            - case Walking:
                 - narrate "<&[base]>Your walking speed is set at <&[emphasis]><player.walk_speed><&[base]>!"
             - case Flying:
                 - narrate "<&[base]>Your flying speed is set at <&[emphasis]><player.fly_speed><&[base]>!"
             - default:
-                - narrate "<&[error]>If you saw this message, the author did a fuckie wuckie somewhere! Please contact!"
+                - narrate "<&[error]>If you saw this message, something went terribly wrong. Please contact the author!"
     - else:
         - define speed <context.args.get[2]>
         - if !<[speed].is_decimal>:
             - narrate "<&[error]>Speed input must be a number!"
             - stop
-        - define speed <[speed].round_to_precision[0.1]>
         - narrate "<&[warning]><[msg]> speed changed to <[speed]>"
-        - adjust <player> <[type]>:<[speed].div[10]>
+        - choose <[msg]>:
+            - case Walking:
+                - adjust <player> walk_speed:<[speed]>
+            - case Flying:
+                - adjust <player> fly_speed:<[speed]>
+            - default:
+                - narrate "<&[error]>If you saw this message, something went terribly wrong. Please contact the author!"
+
+dcommands_rename:
+    type: command
+    name: rename
+    description: Renames the item on your hand. Accepts tags.
+    usage: /rename [text | Reset]
+    permission: dcommands.rename
+    tab completions:
+        1: Reset
+    data:
+        arguments:
+            minimum: 1
+            maximum: 1
+    debug: false
+    script:
+    - inject dcommands_inject_arguments
+    - define newname <context.raw_args>
+    - if <[newname]> == Reset:
+        - inventory adjust slot:hand display
+        - stop
+    - narrate "<&[warning]>Renaming <player.item_in_hand.display.if_null[<player.item_in_hand.material.translated_name>]> <&[warning]>to <[newname].parsed><&[warning]>."
+    - inventory adjust slot:hand display:<[newname].parsed>
+
+dcommands_lore_add:
+    type: command
+    name: loreadd
+    description: Adds lore to the item on your hand. Accepts tags.
+    usage: /loreadd [text]
+    permission: dcommands.loreadd
+    aliases:
+    - addlore
+    tab completions:
+        1: <empty>
+    data:
+        arguments:
+            minimum: 1
+            maximum: 999
+    debug: false
+    script:
+    - inject dcommands_inject_arguments
+    - define lore <context.raw_args.parsed>
+    - inventory adjust slot:hand lore:<player.item_in_hand.lore.include[<[lore]>].if_null[<[lore]>]>
+    - narrate "<&[warning]>Adding lore '<&[emphasis]><[lore]><&[warning]>' to <player.item_in_hand.display.if_null[<player.item_in_hand.material.translated_name>]><&[warning]>."
+
+dcommands_lore_remove:
+    type: command
+    name: loreremove
+    description: Removes a line of lore from the item on your hand. Accepts tags.
+    usage: /loreremove [line]
+    permission: dcommands.loreremove
+    aliases:
+    - removelore
+    tab completions:
+        1: <util.list_numbers[from=1;to=<player.item_in_hand.lore.size.if_null[0]>].if_null[<empty>]>
+    data:
+        arguments:
+            minimum: 1
+            maximum: 1
+    debug: false
+    script:
+    - inject dcommands_inject_arguments
+    - if <player.item_in_hand.lore.if_null[null]> == null:
+        - narrate "<&[error]>This item does not have lore!"
+        - stop
+    - define line <context.args.first>
+    - if !<[line].is_integer>:
+        - narrate "<&[error]>Line input must be an integer!"
+        - stop
+    - define lore <player.item_in_hand.lore.get[<[line]>]>
+    - inventory adjust slot:hand lore:<player.item_in_hand.lore.remove[<[line]>]>
+    - narrate "<&[warning]>Removing lore line number <[line]>. That line contained '<[lore]><&[warning]>'."
